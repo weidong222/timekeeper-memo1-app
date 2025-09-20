@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+    <title>时光备忘录</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#87CEEB">
+    <link rel="icon" type="image/png" sizes="192x192" href="res/icon/android/xxxhdpi.png">
+    <link rel="apple-touch-icon" href="res/icon/android/xxxhdpi.png">
+</head>
+<body>
+    <!-- 主界面 -->
+    <div id="main-screen" class="screen active">
+        <!-- 顶部导航栏 -->
+        <header class="top-nav">
+            <button class="nav-btn back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1 class="app-title">时光备忘录</h1>
+            <button class="nav-btn theme-toggle" id="theme-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <!-- 搜索栏 -->
+        <div class="search-bar">
+            <div class="search-input-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="搜索备忘录...">
+                <button class="filter-btn" id="filter-btn">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 筛选面板 -->
+        <div id="filter-panel" class="filter-panel hidden">
+            <div class="filter-group">
+                <label>优先级：</label>
+                <select id="priority-filter">
+                    <option value="">全部</option>
+                    <option value="high">高优先级</option>
+                    <option value="medium">中优先级</option>
+                    <option value="low">低优先级</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>状态：</label>
+                <select id="status-filter">
+                    <option value="">全部</option>
+                    <option value="pending">未完成</option>
+                    <option value="completed">已完成</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 中间内容展示区 -->
+        <main class="content-area">
+            <div id="memo-list" class="memo-list">
+                <!-- 备忘录卡片将通过JavaScript动态生成 -->
+            </div>
+            <div id="empty-state" class="empty-state">
+                <i class="fas fa-clock"></i>
+                <p>暂无备忘录闹钟</p>
+                <p>点击下方"+"按钮添加</p>
+            </div>
+        </main>
+
+        <!-- 底部功能栏 -->
+        <footer class="bottom-nav">
+            <button class="nav-btn add-btn" id="add-memo-btn">
+                <i class="fas fa-plus"></i>
+                <span>添加备忘录</span>
+            </button>
+            <button class="nav-btn calendar-btn" id="calendar-btn">
+                <i class="fas fa-calendar"></i>
+                <span>日历视图</span>
+            </button>
+            <button class="nav-btn profile-btn">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </button>
+        </footer>
+    </div>
+
+    <!-- 添加备忘录界面 -->
+    <div id="add-screen" class="screen">
+        <!-- 顶部返回及保存栏 -->
+        <header class="top-nav">
+            <button class="nav-btn back-to-main">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <button class="save-btn" id="save-memo-btn">保存</button>
+            <button class="nav-btn close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </header>
+
+        <!-- 中间输入区 -->
+        <main class="input-area">
+            <div class="input-group">
+                <input type="text" id="memo-title" class="input-field" placeholder="请输入备忘录标题">
+            </div>
+            <div class="input-group">
+                <textarea id="memo-content" class="input-field textarea" placeholder="请输入详细内容" rows="4"></textarea>
+            </div>
+            <div class="input-group">
+                <label class="input-label">优先级</label>
+                <select id="memo-priority" class="input-field">
+                    <option value="low">低优先级</option>
+                    <option value="medium" selected>中优先级</option>
+                    <option value="high">高优先级</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label class="input-label">提醒时间</label>
+                <input type="time" id="memo-time" class="input-field">
+            </div>
+            <div class="input-group">
+                <label class="input-label">提醒日期</label>
+                <input type="date" id="memo-date" class="input-field">
+            </div>
+            <div class="input-group">
+                <label class="input-label">重复设置</label>
+                <select id="memo-repeat" class="input-field">
+                    <option value="none">不重复</option>
+                    <option value="daily">每天</option>
+                    <option value="weekly">每周</option>
+                    <option value="monthly">每月</option>
+                    <option value="weekdays">工作日</option>
+                    <option value="weekends">周末</option>
+                </select>
+            </div>
+        </main>
+    </div>
+
+    <!-- 闹钟提醒界面 -->
+    <div id="alarm-screen" class="screen alarm-overlay">
+        <div class="alarm-content">
+            <div class="alarm-header">
+                <i class="fas fa-bell alarm-icon"></i>
+                <h2 id="alarm-title">备忘录提醒</h2>
+            </div>
+            <div class="alarm-body">
+                <p id="alarm-text">这是您的备忘录内容</p>
+                <div class="alarm-time">
+                    <span id="alarm-current-time"></span>
+                </div>
+            </div>
+            <div class="alarm-actions">
+                <button class="alarm-btn snooze-btn" id="snooze-btn">稍后提醒</button>
+                <button class="alarm-btn complete-btn" id="complete-btn">完成</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 日历视图界面 -->
+    <div id="calendar-screen" class="screen">
+        <!-- 顶部导航栏 -->
+        <header class="top-nav">
+            <button class="nav-btn back-to-main">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1 class="app-title">日历视图</h1>
+            <button class="nav-btn today-btn" id="today-btn">
+                <i class="fas fa-calendar-day"></i>
+            </button>
+        </header>
+
+        <!-- 日历导航 -->
+        <div class="calendar-nav">
+            <button class="nav-btn" id="prev-month">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2 id="current-month">2024年1月</h2>
+            <button class="nav-btn" id="next-month">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- 日历主体 -->
+        <main class="calendar-container">
+            <div class="calendar-weekdays">
+                <div class="weekday">日</div>
+                <div class="weekday">一</div>
+                <div class="weekday">二</div>
+                <div class="weekday">三</div>
+                <div class="weekday">四</div>
+                <div class="weekday">五</div>
+                <div class="weekday">六</div>
+            </div>
+            <div id="calendar-grid" class="calendar-grid">
+                <!-- 日历日期将通过JavaScript动态生成 -->
+            </div>
+            <div id="calendar-memo-list" class="calendar-memo-list">
+                <h3>选中日期的备忘录</h3>
+                <div id="selected-date-memos" class="selected-date-memos">
+                    <p class="no-memos">请选择日期查看备忘录</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script src="cordova-app.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // 注册Service Worker (PWA支持)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

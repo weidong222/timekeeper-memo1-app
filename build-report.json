@@ -1,0 +1,28 @@
+{
+  "appName": "时光备忘录",
+  "version": "1.0.0",
+  "buildTime": "2025-09-20T13:21:09.161Z",
+  "platform": "Android",
+  "buildType": "Mock Build",
+  "features": [
+    "备忘录管理",
+    "智能闹钟",
+    "优先级标记",
+    "重复提醒",
+    "日历视图",
+    "搜索筛选",
+    "深色模式",
+    "移动端优化"
+  ],
+  "plugins": [
+    "cordova-plugin-whitelist",
+    "cordova-plugin-statusbar",
+    "cordova-plugin-device",
+    "cordova-plugin-splashscreen",
+    "cordova-plugin-vibration"
+  ],
+  "warnings": [
+    "这是一个模拟构建，不是真正的APK文件",
+    "要获得可安装的APK，请使用真实的构建环境"
+  ]
+}

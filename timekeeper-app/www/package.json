@@ -1,0 +1,29 @@
+{
+  "name": "timekeeper-memo",
+  "displayName": "时光备忘录",
+  "version": "1.0.0",
+  "description": "一个功能强大的移动备忘录闹钟应用，支持优先级管理、重复提醒、日历视图等功能。",
+  "main": "index.js",
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {
+      "cordova-plugin-whitelist": {},
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-device": {},
+      "cordova-plugin-splashscreen": {},
+      "cordova-plugin-vibration": {}
+    }
+  },
+  "keywords": [
+    "memo",
+    "alarm",
+    "reminder",
+    "mobile",
+    "cordova",
+    "android"
+  ],
+  "author": "时光备忘录开发团队",
+  "license": "MIT"
+}

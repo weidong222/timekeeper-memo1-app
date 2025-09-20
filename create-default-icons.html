@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>生成默认图标</title>
+</head>
+<body>
+    <script>
+        // 创建不同尺寸的默认图标
+        const iconSizes = [
+            { name: 'ldpi', size: 36 },
+            { name: 'mdpi', size: 48 },
+            { name: 'hdpi', size: 72 },
+            { name: 'xhdpi', size: 96 },
+            { name: 'xxhdpi', size: 144 },
+            { name: 'xxxhdpi', size: 192 }
+        ];
+
+        function createIcon(size, name) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // 绘制背景
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, size, size);
+            
+            // 绘制圆角
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, size * 0.2);
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+            
+            // 绘制文字
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = `bold ${size * 0.35}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('时光', size / 2, size / 2);
+            
+            // 下载图标
+            const link = document.createElement('a');
+            link.download = `${name}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // 生成所有尺寸的图标
+        iconSizes.forEach(({ name, size }) => {
+            setTimeout(() => createIcon(size, name), 100);
+        });
+
+        document.body.innerHTML = '<h1>正在生成默认图标...</h1><p>请将下载的图标文件放入 build-package/res/icon/android/ 目录</p>';
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "name": "timekeeper-memo",
+  "displayName": "时光备忘录",
+  "version": "1.0.0",
+  "description": "一个功能强大的移动备忘录闹钟应用",
+  "main": "index.js",
+  "scripts": {
+    "build": "cordova build android",
+    "build-release": "cordova build android --release",
+    "run": "cordova run android",
+    "prepare": "cordova prepare",
+    "clean": "cordova clean",
+    "add-android": "cordova platform add android",
+    "remove-android": "cordova platform remove android",
+    "install-plugins": "npm run install-plugin-whitelist && npm run install-plugin-statusbar && npm run install-plugin-device && npm run install-plugin-splashscreen && npm run install-plugin-vibration && npm run install-plugin-notification && npm run install-plugin-background",
+    "install-plugin-whitelist": "cordova plugin add cordova-plugin-whitelist",
+    "install-plugin-statusbar": "cordova plugin add cordova-plugin-statusbar",
+    "install-plugin-device": "cordova plugin add cordova-plugin-device",
+    "install-plugin-splashscreen": "cordova plugin add cordova-plugin-splashscreen",
+    "install-plugin-vibration": "cordova plugin add cordova-plugin-vibration",
+    "install-plugin-notification": "cordova plugin add cordova-plugin-local-notification",
+    "install-plugin-background": "cordova plugin add cordova-plugin-background-mode",
+    "setup": "npm install && cordova platform add android && npm run install-plugins",
+    "dev": "cordova run android --device",
+    "emulator": "cordova emulate android"
+  },
+  "keywords": [
+    "memo",
+    "alarm",
+    "reminder",
+    "mobile",
+    "cordova",
+    "android"
+  ],
+  "author": "时光备忘录开发团队",
+  "license": "MIT",
+  "devDependencies": {
+    "cordova": "^12.0.0",
+    "cordova-android": "^12.0.0"
+  },
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {
+      "cordova-plugin-whitelist": {},
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-device": {},
+      "cordova-plugin-splashscreen": {},
+      "cordova-plugin-vibration": {},
+      "cordova-plugin-local-notification": {},
+      "cordova-plugin-background-mode": {}
+    }
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1"
+  }
+}

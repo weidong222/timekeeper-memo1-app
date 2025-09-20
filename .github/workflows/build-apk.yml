@@ -1,0 +1,195 @@
+name: 🚀 Build 时光备忘录 APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+        - release
+        - debug
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: ☕ Setup Java JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        
+    - name: 🤖 Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: 📦 Install Global Dependencies
+      run: |
+        npm install -g cordova@latest
+        cordova telemetry off
+        
+    - name: 📋 Install Project Dependencies
+      run: |
+        if [ -f package.json ]; then
+          npm install
+        else
+          echo "No package.json found, skipping npm install"
+        fi
+        
+    - name: 🔧 Prepare Cordova Project
+      run: |
+        # 如果不是Cordova项目，创建一个
+        if [ ! -f config.xml ]; then
+          cordova create temp-app com.timekeeper.memo "时光备忘录"
+          cp -r build-package/* temp-app/www/
+          cp build-package/config.xml temp-app/
+          cd temp-app
+        fi
+        
+        # 添加Android平台
+        cordova platform add android@latest
+        
+    - name: 🔌 Install Cordova Plugins
+      run: |
+        cordova plugin add cordova-plugin-whitelist
+        cordova plugin add cordova-plugin-statusbar
+        cordova plugin add cordova-plugin-device
+        cordova plugin add cordova-plugin-splashscreen
+        cordova plugin add cordova-plugin-vibration
+        
+    - name: 🏗️ Build APK
+      run: |
+        BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
+        echo "Building $BUILD_TYPE APK..."
+        
+        if [ "$BUILD_TYPE" = "release" ]; then
+          cordova build android --release
+          APK_PATH="platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk"
+        else
+          cordova build android --debug
+          APK_PATH="platforms/android/app/build/outputs/apk/debug/app-debug.apk"
+        fi
+        
+        # 检查APK是否生成成功
+        if [ -f "$APK_PATH" ]; then
+          echo "✅ APK built successfully: $APK_PATH"
+          ls -la "$APK_PATH"
+        else
+          echo "❌ APK build failed"
+          exit 1
+        fi
+        
+    - name: 📱 Rename APK
+      run: |
+        BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
+        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+        
+        if [ "$BUILD_TYPE" = "release" ]; then
+          cp platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk \
+             "时光备忘录-v1.0.0-${TIMESTAMP}-release.apk"
+        else
+          cp platforms/android/app/build/outputs/apk/debug/app-debug.apk \
+             "时光备忘录-v1.0.0-${TIMESTAMP}-debug.apk"
+        fi
+        
+    - name: 📤 Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: timekeeper-memo-apk-${{ github.event.inputs.build_type || 'release' }}
+        path: |
+          时光备忘录-v1.0.0-*-*.apk
+        retention-days: 30
+        
+    - name: 📊 Build Summary
+      run: |
+        echo "## 🎉 构建完成!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📱 应用信息" >> $GITHUB_STEP_SUMMARY
+        echo "- **应用名称**: 时光备忘录" >> $GITHUB_STEP_SUMMARY
+        echo "- **版本**: 1.0.0" >> $GITHUB_STEP_SUMMARY
+        echo "- **构建类型**: ${{ github.event.inputs.build_type || 'release' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **构建时间**: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📦 下载APK" >> $GITHUB_STEP_SUMMARY
+        echo "1. 点击上方的 **Artifacts** 部分" >> $GITHUB_STEP_SUMMARY
+        echo "2. 下载 \`timekeeper-memo-apk-${{ github.event.inputs.build_type || 'release' }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "3. 解压获得APK文件" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### ✨ 应用功能" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ 备忘录管理" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ 智能闹钟提醒" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ 优先级标记" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ 重复提醒" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ 日历视图" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ 搜索筛选" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ 深色模式" >> $GITHUB_STEP_SUMMARY
+
+  # 可选：构建多个版本
+  build-variants:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    strategy:
+      matrix:
+        build-type: [debug, release]
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: ☕ Setup Java JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        
+    - name: 🤖 Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: 📦 Install Dependencies
+      run: |
+        npm install -g cordova@latest
+        cordova telemetry off
+        
+    - name: 🏗️ Build ${{ matrix.build-type }} APK
+      run: |
+        # 准备项目
+        if [ ! -f config.xml ]; then
+          cordova create temp-app com.timekeeper.memo "时光备忘录"
+          cp -r build-package/* temp-app/www/
+          cp build-package/config.xml temp-app/
+          cd temp-app
+        fi
+        
+        # 添加平台和插件
+        cordova platform add android@latest
+        cordova plugin add cordova-plugin-whitelist cordova-plugin-statusbar cordova-plugin-device cordova-plugin-splashscreen cordova-plugin-vibration
+        
+        # 构建
+        cordova build android --${{ matrix.build-type }}
+        
+    - name: 📤 Upload ${{ matrix.build-type }} APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: timekeeper-memo-${{ matrix.build-type }}-apk
+        path: platforms/android/app/build/outputs/apk/${{ matrix.build-type }}/*.apk
